@@ -18,13 +18,14 @@ COPY src ./src
 RUN npm ci
 
 # Remove dev dependencies
-RUN npm prune --production
+RUN npm prune --omit=dev
 
 # Stage 2: Production
 FROM node:22-alpine AS production
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Patch OS packages and install dumb-init for proper signal handling
+RUN apk upgrade --no-cache && \
+    apk add --no-cache dumb-init
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
